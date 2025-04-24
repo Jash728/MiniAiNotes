@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server'
 import axios from 'axios'
 
@@ -31,10 +30,20 @@ export async function POST(req: Request) {
 
     const summary = res.data.choices?.[0]?.message?.content || 'No summary returned.'
     return NextResponse.json({ summary })
-  } catch (error: any) {
-    console.error('[Summarize Route Error]', error.response?.data || error.message)
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        (error.response?.data as { message?: string })?.message || error.message
+      console.error('[Summarize Route Error]', message)
+      return new NextResponse(
+        JSON.stringify({ error: 'Failed to summarize', detail: message }),
+        { status: 500 }
+      )
+    }
+
+    console.error('[Summarize Route Error]', error)
     return new NextResponse(
-      JSON.stringify({ error: 'Failed to summarize', detail: error.message }),
+      JSON.stringify({ error: 'Unexpected error', detail: String(error) }),
       { status: 500 }
     )
   }
