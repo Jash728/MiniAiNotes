@@ -2,27 +2,29 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+// import { Session } from '@supabase/supabase-js'
 
-export default function AuthCallback() {
+export default function AuthCallbackPage() {
   const router = useRouter()
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    const handleOAuthRedirect = async () => {
+    const handleAuth = async () => {
       const {
         data: { session },
-        error,
       } = await supabase.auth.getSession()
 
-      if (error) {
-        console.error('OAuth error:', error.message)
-      } else if (session) {
-        router.push('/notes') 
+      if (session) {
+        router.replace('/notes') // ✅ redirect here after login
+      } else {
+        console.error('No session found')
+        router.replace('/auth') // fallback in case session fails
       }
     }
 
-    handleOAuthRedirect()
-  }, [])
+    handleAuth()
+  }, [router])
 
-  return <p className="text-center p-10">Signing you in...</p>
+  return <p>Redirecting...</p>
 }
