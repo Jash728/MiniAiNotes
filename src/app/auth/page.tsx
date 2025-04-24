@@ -42,9 +42,13 @@ export default function AuthPage() {
         data: { session },
       } = await supabase.auth.getSession()
 
-      if (session?.user?.email_confirmed_at || session?.user?.identities?.length > 0) {
+      if (
+        session?.user?.email_confirmed_at ||
+        (session?.user?.identities?.length ?? 0) > 0
+      ) {
         router.push('/notes')
       }
+      
     }
 
     checkSession()

@@ -27,6 +27,7 @@ export default function NoteCard({ id, title, content, created_at }: NoteCardPro
       const result = await summarizeNote(content)
       setSummary(result)
     } catch (err) {
+      console.log(err)
       alert('Failed to summarize')
     }
     setSummarizing(false)
